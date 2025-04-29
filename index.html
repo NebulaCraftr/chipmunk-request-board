@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三色栗鼠的直播点歌台</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: url('background.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px 40px;
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            color: #734646;
+        }
+        
+        header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        header h1 {
+            text-shadow: 1px 1px 3px rgba(255, 230, 230, 0.4);
+            color: #c96e6e;
+            font-size: 2.2em;
+            margin: 0 auto 10px;
+        }
+        
+        /* 说明文字 */
+        header p {
+            color: #a06868;
+            font-size: 1em;
+            margin: 6px 0 16px;
+        }
+        
+        /* 搜索框样式 */
+        .search-bar {
+            text-align: center;
+            margin: 25px 0 10px;
+        }
+        .search-bar input {
+            padding: 10px 14px;
+            width: 70%;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            color: #734646;
+        }
+        
+        /* 表格字体与颜色 */
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background-color: rgba(255, 255, 255, 0.4);
+            color: #9a6767;
+            padding: 12px;
+            text-align: left;
+            font-size: 1em;
+        }
+        
+        td {
+            background-color: rgba(255, 255, 255, 0.4);
+            color: #794f4f;
+            padding: 12px;
+            font-size: 0.95em;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        /* 点歌链接文字 */
+        .song-name {
+            color: #8b9eea;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .song-name:hover {
+            color: #e89966;
+        }
+        
+        th {
+            background-color: rgba(255, 255, 255, 0.4);
+            color: #9a6767; /* 粉棕色 */
+        }
+        
+        td {
+            background-color: rgba(255, 255, 255, 0.4);
+            color: #794f4f; /* 表格字体色：亮棕红 */
+        }
+        
+        .form-add input,
+        .search-bar input {
+            color: #734646; /* 输入框文字也变成暖色 */
+        }
+        
+        .form-add button {
+            background-color: #e89966; /* 橘粉色按钮 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .title-text {
+            color: #c96e6e;
+        }
+        
+        .music-note {
+            font-family: 'Segoe UI Symbol', sans-serif;
+            -webkit-text-fill-color: #f6ad55;
+            text-shadow: 0 0 8px #f7c97f;
+            display: inline-block;
+            animation: float 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px #f9d87a);
+        }
+
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .toast {
+            background: #e89966;
+            color: white;
+        }
+        canvas {
+            position: fixed;
+            left: 0;
+            top: 0;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+<canvas id="particleCanvas"></canvas>
+<div class="container">
+    <header>
+        <h1><span class="title-text">三色栗鼠的直播点歌台</span> <span class="music-note">🎶</span></h1>
+        <p>直播时间：深夜12:00-4:00 | 粉丝群：置顶动态扫码</p>
+      </header>
+
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="搜索歌名或歌手..." oninput="filterSongs()">
+    </div>
+
+    <table id="songTable">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>歌名</th>
+            <th>歌手</th>
+            <th>类别</th>
+            <th>备注</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 枫')">枫</span></td>
+                <td>周杰伦</td>
+                <td>伤感</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 星晴')">星晴</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 晴天')">晴天</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 彩虹')">彩虹</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 搁浅')">搁浅</span></td>
+                <td>周杰伦</td>
+                <td>伤感</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 安静')">安静</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 花海')">花海</span></td>
+                <td>周杰伦</td>
+                <td>伤感</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 借口')">借口</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 素颜')">素颜</span></td>
+                <td>许嵩/何曼婷</td>
+                <td>流行</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 稻香')">稻香</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td><span class="song-name" onclick="copyText(event, '点歌 明明就')">明明就</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 珊瑚海')">珊瑚海</span></td>
+                <td>周杰伦/梁心颐</td>
+                <td>伤感</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 龙卷风')">龙卷风</span></td>
+                <td>周杰伦</td>
+                <td>伤感</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 七里香')">七里香</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>15</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 简单爱')">简单爱</span></td>
+                <td>周杰伦</td>
+                <td>甜歌</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>16</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 甜甜的')">甜甜的</span></td>
+                <td>周杰伦</td>
+                <td>甜歌</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>17</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 说了再见')">说了再见</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>18</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 黑色幽默')">黑色幽默</span></td>
+                <td>周杰伦</td>
+                <td>伤感</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>19</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 回到过去')">回到过去</span></td>
+                <td>周杰伦</td>
+                <td>伤感</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>20</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 断了的弦')">断了的弦</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 有何不可')">有何不可</span></td>
+                <td>许嵩</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>22</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 一路向北')">一路向北</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>23</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 等你下课')">等你下课</span></td>
+                <td>周杰伦/杨瑞代</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>24</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 交换余生')">交换余生</span></td>
+                <td>林俊杰</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>25</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 告白气球')">告白气球</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>26</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 私奔到月球')">私奔到月球</span></td>
+                <td>五月天/陈绮贞</td>
+                <td>甜歌</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>27</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 突然好想你')">突然好想你</span></td>
+                <td>五月天</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>28</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 后来的我们')">后来的我们</span></td>
+                <td>五月天</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>29</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 恋爱ing')">恋爱ing</span></td>
+                <td>五月天</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>30</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 蒲公英的约定')">蒲公英的约定</span></td>
+                <td>周杰伦</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>31</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 说好的幸福呢')">说好的幸福呢</span></td>
+                <td>周杰伦</td>
+                <td>伤感</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>32</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 那些你很冒险的梦')">那些你很冒险的梦</span></td>
+                <td>林俊杰</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>33</td>
+                <td><span class='song-name' onclick="copyText(event, '点歌 你不是真正的快乐')">你不是真正的快乐</span></td>
+                <td>五月天</td>
+                <td>流行</td>
+                <td></td>
+              </tr>
+        </tbody>
+    </table>
+    <div class="toast" id="toast"></div>
+</div>
+
+<script>
+    function filterSongs() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const rows = document.querySelectorAll('#songTable tbody tr');
+        rows.forEach(row => {
+            const song = row.cells[1].innerText.toLowerCase();
+            const singer = row.cells[2].innerText.toLowerCase();
+            row.style.display = song.includes(input) || singer.includes(input) ? '' : 'none';
+        });
+    }
+
+    function copyText(event, text) {
+        navigator.clipboard.writeText(text);
+        showToast(text);
+        explode(event.clientX, event.clientY);
+    }
+
+    function addSong() {
+        const song = document.getElementById('song').value;
+        const singer = document.getElementById('singer').value;
+        const type = document.getElementById('type').value;
+        const note = document.getElementById('note').value;
+        if (!song || !singer) return;
+        const table = document.querySelector('#songTable tbody');
+        const row = document.createElement('tr');
+        const index = table.rows.length + 1;
+        row.innerHTML = `<td>${index}</td><td><span class="song-name" onclick="copyText(event, '点歌 ${song}')">${song}</span></td><td>${singer}</td><td>${type}</td><td>${note}</td>`;
+        table.appendChild(row);
+        document.getElementById('song').value = '';
+        document.getElementById('singer').value = '';
+        document.getElementById('type').value = '';
+        document.getElementById('note').value = '';
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = `已复制：${msg}`;
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 2000);
+    }
+
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+
+    function explode(x, y) {
+        for (let i = 0; i < 30; i++) {
+            particles.push({
+                x, y,
+                dx: (Math.random() - 0.5) * 6,
+                dy: (Math.random() - 0.5) * 6,
+                life: 60
+            });
+        }
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            ctx.fillStyle = `rgba(255, 215, 0, ${p.life / 60})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+            p.x += p.dx;
+            p.y += p.dy;
+            p.life--;
+            if (p.life <= 0) particles.splice(i, 1);
+        }
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+</script>
+</body>
+</html>
